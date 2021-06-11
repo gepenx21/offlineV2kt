@@ -1,7 +1,6 @@
 package com.shankara.mscoffln;
 
 import android.annotation.SuppressLint;
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -81,7 +80,6 @@ public class MainActivity extends AppCompatActivity {
     Animation anim = new AlphaAnimation(0.0f, 1.0f);
     boolean mBlinking = false;
     FragmentManager fm = getSupportFragmentManager();
-    BroadcastReceiver mReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -143,15 +141,6 @@ public class MainActivity extends AppCompatActivity {
         pushInfo();
         initDrawer();
         getSongListMain();
-    }
-
-    @Override
-    protected void onDestroy() {
-        if (mReceiver != null) {
-            unregisterReceiver(mReceiver);
-            mReceiver = null;
-        }
-        super.onDestroy();
     }
 
     public static Intent getIntent(Context context, boolean consent) {
