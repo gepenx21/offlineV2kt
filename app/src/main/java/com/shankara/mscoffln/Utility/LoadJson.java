@@ -7,7 +7,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class loadJson {
+public class LoadJson {
     public static String loadJSONFromAsset(Context context, String jsonFile) {
         //Turn json data into string
         StringBuilder stringBuilder = new StringBuilder();

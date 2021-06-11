@@ -1,6 +1,7 @@
 package com.shankara.mscoffln;
 
 import android.annotation.SuppressLint;
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
@@ -39,9 +40,9 @@ import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.shankara.mscoffln.Adapter.SongAdapter;
 import com.shankara.mscoffln.Model.Song;
+import com.shankara.mscoffln.Utility.LoadJson;
 import com.shankara.mscoffln.Utility.ScrollTextView;
 import com.shankara.mscoffln.Utility.Utility;
-import com.shankara.mscoffln.Utility.loadJson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -80,6 +81,7 @@ public class MainActivity extends AppCompatActivity {
     Animation anim = new AlphaAnimation(0.0f, 1.0f);
     boolean mBlinking = false;
     FragmentManager fm = getSupportFragmentManager();
+    BroadcastReceiver mReceiver = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -141,6 +143,15 @@ public class MainActivity extends AppCompatActivity {
         pushInfo();
         initDrawer();
         getSongListMain();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mReceiver != null) {
+            unregisterReceiver(mReceiver);
+            mReceiver = null;
+        }
+        super.onDestroy();
     }
 
     public static Intent getIntent(Context context, boolean consent) {
@@ -314,12 +325,12 @@ public class MainActivity extends AppCompatActivity {
 
                     @Override
                     public void onInterstitialShown() {
-                        intShow = false;
+
                     }
 
                     @Override
                     public void onInterstitialShowFailed() {
-
+                        intShow = false;
                     }
 
                     @Override
@@ -331,6 +342,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onInterstitialClosed() {
                         mp.start();
                         playProgress();
+                        intShow = false;
                         randomNum();
                     }
 
@@ -382,7 +394,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void getSongList(final ApiInterface callback){
         try {
-            JSONArray jsonArray = new JSONArray(loadJson.loadJSONFromAsset(this, JSON_ID));
+            JSONArray jsonArray = new JSONArray(LoadJson.loadJSONFromAsset(this, JSON_ID));
             ArrayList<Song> songs = new ArrayList<>();
             if (jsonArray.length() > 0) {
                 for (int i = 0; i < jsonArray.length(); i++) {
