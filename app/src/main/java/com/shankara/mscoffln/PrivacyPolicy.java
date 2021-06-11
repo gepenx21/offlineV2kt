@@ -1,4 +1,4 @@
-package com.shankara.djtiktoknew;
+package com.shankara.mscoffln;
 
 import android.content.SharedPreferences;
 import android.graphics.Typeface;

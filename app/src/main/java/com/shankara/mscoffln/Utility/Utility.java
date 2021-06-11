@@ -1,4 +1,4 @@
-package com.shankara.djtiktoknew.Utility;
+package com.shankara.mscoffln.Utility;
 
 
 import android.animation.Animator;
@@ -8,8 +8,6 @@ import android.animation.ObjectAnimator;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
-
-import java.util.StringTokenizer;
 
 public class Utility {
 

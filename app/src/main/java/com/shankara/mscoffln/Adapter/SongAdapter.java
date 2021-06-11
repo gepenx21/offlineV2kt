@@ -1,4 +1,4 @@
-package com.shankara.djtiktoknew.Adapter;
+package com.shankara.mscoffln.Adapter;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,9 +11,9 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.shankara.djtiktoknew.Config;
-import com.shankara.djtiktoknew.Model.Song;
-import com.shankara.djtiktoknew.R;
+import com.shankara.mscoffln.Config;
+import com.shankara.mscoffln.Model.Song;
+import com.shankara.mscoffln.R;
 
 import java.util.ArrayList;
 

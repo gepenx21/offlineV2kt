@@ -1,4 +1,4 @@
-package com.shankara.djtiktoknew;
+package com.shankara.mscoffln;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
@@ -36,11 +37,11 @@ import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
 import com.mikepenz.materialdrawer.DrawerBuilder;
 import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
-import com.shankara.djtiktoknew.Adapter.SongAdapter;
-import com.shankara.djtiktoknew.Model.Song;
-import com.shankara.djtiktoknew.Utility.ScrollTextView;
-import com.shankara.djtiktoknew.Utility.Utility;
-import com.shankara.djtiktoknew.Utility.loadJson;
+import com.shankara.mscoffln.Adapter.SongAdapter;
+import com.shankara.mscoffln.Model.Song;
+import com.shankara.mscoffln.Utility.ScrollTextView;
+import com.shankara.mscoffln.Utility.Utility;
+import com.shankara.mscoffln.Utility.loadJson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,10 +52,10 @@ import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Random;
 
-import static com.shankara.djtiktoknew.Config.JSON_ID;
+import static com.shankara.mscoffln.Config.JSON_ID;
 
 
-public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCompletionListener {
+public class MainActivity extends AppCompatActivity {
 
 
     private static final String CONSENT = "consent";
@@ -67,9 +68,9 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     private ProgressBar pb_main_loader;
     private MediaPlayer mediaPlayer;
     private SeekBar mSeekBar;
-    private boolean firstLaunch = true;
+    boolean firstLaunch = true;
     private static int mCount = 0;
-    private static int counter = 3;
+    private static int counter = 1;
     boolean intShow = false;
     Toolbar toolbar;
     Drawer result;
@@ -84,16 +85,17 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         Appodeal.initialize(this,Config.appId, Appodeal.BANNER | Appodeal.INTERSTITIAL);
         Appodeal.disableLocationPermissionCheck();
         Appodeal.setTesting(true);
+        Appodeal.cache(this, Appodeal.INTERSTITIAL);
         initializeViews();
 
         songList = new ArrayList<>();
         recycler.setHasFixedSize(true);
         recycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         mAdapter = new SongAdapter(getApplicationContext(), songList, (song, position) -> {
-            firstLaunch = false;
             changeSelectedSong(position);
             if (mBlinking) {
                 mBlinking = false;
@@ -101,6 +103,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
                 tv_time.setAlpha(1.0f);
             }
             prepareSong(song);
+
         });
         LinearLayout linearlayout = findViewById(R.id.adView);
         Appodeal.setBannerViewId(R.id.appodealBannerView);
@@ -117,14 +120,14 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         anim.setRepeatCount(Animation.INFINITE);
 
         mediaPlayer.setOnCompletionListener(mp -> {
-            if (Config.isPlaying) {
-                Config.isPlaying = false;
+            if (Config.isPlaying){
+                Config.isPlaying=false;
             }
-            if (currentIndex + 1 < songList.size()) {
+            if(currentIndex + 1 < songList.size()){
                 Song next = songList.get(currentIndex + 1);
-                changeSelectedSong(currentIndex + 1);
+                changeSelectedSong(currentIndex+1);
                 prepareSong(next);
-            } else {
+            }else{
                 Song next = songList.get(0);
                 changeSelectedSong(0);
                 prepareSong(next);
@@ -218,10 +221,12 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     }
 
     private void prepareSong(Song song){
+        if (firstLaunch) {
+            firstLaunch = false;
+        }
         showIntersititial(true);
         Config.isPlaying = true;
         pb_main_loader.setVisibility(View.VISIBLE);
-        //tb_title.setVisibility(View.GONE);
         iv_play.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.selector_play));
         tb_title.setText(song.getTitle());
         tb_title.startScroll();
@@ -265,7 +270,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
     }
 
     static void randomNum() {
-        int number = 4;
+        int number = 5;
         counter = new Random().nextInt(number);
     }
 
@@ -278,7 +283,6 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
                 if (Appodeal.isLoaded(Appodeal.INTERSTITIAL)) {
                     Appodeal.show(this, Appodeal.INTERSTITIAL);
                     mCount=0;
-                    randomNum();
                     intShow = true;
                 }else mCount--;
             }
@@ -310,7 +314,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
 
                     @Override
                     public void onInterstitialShown() {
-
+                        intShow = false;
                     }
 
                     @Override
@@ -327,7 +331,7 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
                     public void onInterstitialClosed() {
                         mp.start();
                         playProgress();
-                        intShow = false;
+                        randomNum();
                     }
 
                     @Override
@@ -531,21 +535,4 @@ public class MainActivity extends AppCompatActivity implements MediaPlayer.OnCom
         });
         builder.show();
     }
-
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        if (Config.isPlaying){
-            Config.isPlaying=false;
-        }
-        if(currentIndex + 1 < songList.size()){
-            Song next = songList.get(currentIndex + 1);
-            changeSelectedSong(currentIndex+1);
-            prepareSong(next);
-        }else{
-            Song next = songList.get(0);
-            changeSelectedSong(0);
-            prepareSong(next);
-        }
-    }
-
 }

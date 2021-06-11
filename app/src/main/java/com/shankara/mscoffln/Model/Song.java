@@ -1,4 +1,4 @@
-package com.shankara.djtiktoknew.Model;
+package com.shankara.mscoffln.Model;
 
 
 public class Song {

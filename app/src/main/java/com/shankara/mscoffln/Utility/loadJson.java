@@ -1,4 +1,4 @@
-package com.shankara.djtiktoknew.Utility;
+package com.shankara.mscoffln.Utility;
 
 import android.content.Context;
 import android.content.res.AssetManager;

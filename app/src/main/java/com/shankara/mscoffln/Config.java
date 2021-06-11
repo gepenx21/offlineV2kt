@@ -1,11 +1,4 @@
-package com.shankara.djtiktoknew;
-
-import android.app.Activity;
-import android.util.Log;
-
-import com.appodeal.ads.Appodeal;
-
-import java.util.Random;
+package com.shankara.mscoffln;
 
 public class Config {
 

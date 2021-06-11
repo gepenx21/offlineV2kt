@@ -1,6 +1,6 @@
-package com.shankara.djtiktoknew;
+package com.shankara.mscoffln;
 
-import com.shankara.djtiktoknew.Model.Song;
+import com.shankara.mscoffln.Model.Song;
 
 import java.util.ArrayList;
 

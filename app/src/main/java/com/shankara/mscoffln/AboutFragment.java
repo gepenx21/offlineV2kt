@@ -1,4 +1,4 @@
-package com.shankara.djtiktoknew;
+package com.shankara.mscoffln;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
