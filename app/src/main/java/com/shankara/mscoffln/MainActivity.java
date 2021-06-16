@@ -3,6 +3,7 @@ package com.shankara.mscoffln;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentSender;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
@@ -22,6 +23,7 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -32,6 +34,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.appodeal.ads.Appodeal;
 import com.appodeal.ads.InterstitialCallbacks;
+import com.google.android.material.snackbar.Snackbar;
+import com.google.android.play.core.appupdate.AppUpdateInfo;
+import com.google.android.play.core.appupdate.AppUpdateManager;
+import com.google.android.play.core.appupdate.AppUpdateManagerFactory;
+import com.google.android.play.core.install.InstallStateUpdatedListener;
+import com.google.android.play.core.install.model.AppUpdateType;
+import com.google.android.play.core.install.model.InstallStatus;
+import com.google.android.play.core.install.model.UpdateAvailability;
+import com.google.android.play.core.review.ReviewInfo;
+import com.google.android.play.core.review.ReviewManager;
+import com.google.android.play.core.review.ReviewManagerFactory;
+import com.google.android.play.core.tasks.OnCompleteListener;
+import com.google.android.play.core.tasks.OnFailureListener;
 import com.mikepenz.materialdrawer.AccountHeader;
 import com.mikepenz.materialdrawer.AccountHeaderBuilder;
 import com.mikepenz.materialdrawer.Drawer;
@@ -42,6 +57,7 @@ import com.shankara.mscoffln.Model.Song;
 import com.shankara.mscoffln.Utility.LoadJson;
 import com.shankara.mscoffln.Utility.ScrollTextView;
 import com.shankara.mscoffln.Utility.Utility;
+import com.google.android.play.core.tasks.Task;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -81,6 +97,13 @@ public class MainActivity extends AppCompatActivity {
     boolean mBlinking = false;
     FragmentManager fm = getSupportFragmentManager();
 
+    private static final int MY_REQUEST_CODE = 999 ;
+    AppUpdateManager appUpdateManager;
+    Task<AppUpdateInfo> appUpdateInfoTask;
+    InstallStateUpdatedListener listener;
+    ReviewInfo reviewInfo;
+    ReviewManager manager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -90,7 +113,9 @@ public class MainActivity extends AppCompatActivity {
         Appodeal.disableLocationPermissionCheck();
         Appodeal.setTesting(true);
         Appodeal.cache(this, Appodeal.INTERSTITIAL);
+        appUpdateManager = AppUpdateManagerFactory.create(MainActivity.this);
         initializeViews();
+        versionCheck();
 
         songList = new ArrayList<>();
         recycler.setHasFixedSize(true);
@@ -141,6 +166,74 @@ public class MainActivity extends AppCompatActivity {
         pushInfo();
         initDrawer();
         getSongListMain();
+        Review();
+    }
+
+    private void versionCheck(){
+        appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
+        appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
+            if (appUpdateInfo.updateAvailability() == UpdateAvailability.UPDATE_AVAILABLE
+                    && appUpdateInfo.isUpdateTypeAllowed(AppUpdateType.IMMEDIATE)) {
+                try {
+                    listener = state -> {
+                        if (state.installStatus() == InstallStatus.DOWNLOADED) {
+                            popupSnackbarForCompleteUpdate();
+                        }
+
+                        if (state.installStatus() == InstallStatus.INSTALLED){
+                            appUpdateManager.unregisterListener(listener);
+                        }
+                    };
+
+                    appUpdateManager.registerListener(listener);
+                    appUpdateManager.startUpdateFlowForResult(
+                            appUpdateInfo, AppUpdateType.IMMEDIATE,
+                            this,
+                            MY_REQUEST_CODE);
+                } catch (IntentSender.SendIntentException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == MY_REQUEST_CODE) {
+            if (resultCode == RESULT_OK) {
+                Toast.makeText(getApplicationContext(), "Update success! Result Code: " + resultCode, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getApplicationContext(), "Update Failed! Result Code: " + resultCode, Toast.LENGTH_LONG).show();
+                versionCheck();
+            }
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    private void popupSnackbarForCompleteUpdate() {
+        Snackbar snackbar =
+                Snackbar.make(
+                        findViewById(R.id.main_layout),
+                        "An update has just been downloaded.",
+                        Snackbar.LENGTH_INDEFINITE);
+        snackbar.setAction("RESTART", view -> appUpdateManager.completeUpdate());
+        snackbar.setActionTextColor(
+                getResources().getColor(R.color.black));
+        snackbar.show();
+    }
+
+    private void Review(){
+        manager = ReviewManagerFactory.create(this);
+        manager.requestReviewFlow().addOnCompleteListener( task -> {
+            if(task.isSuccessful()){
+                reviewInfo = task.getResult();
+                manager.launchReviewFlow(MainActivity.this, reviewInfo)
+                        .addOnFailureListener(e -> Toast.makeText(MainActivity.this, "Rating Failed", Toast.LENGTH_SHORT).show())
+                        .addOnCompleteListener( task1 -> Toast.makeText(MainActivity.this, "Review Completed, Thank You!",
+                        Toast.LENGTH_SHORT).show());
+            }
+
+        }).addOnFailureListener(e -> Toast.makeText(MainActivity.this, "In-App Request Failed", Toast.LENGTH_SHORT).show());
     }
 
     public static Intent getIntent(Context context, boolean consent) {

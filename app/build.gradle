@@ -13,7 +13,7 @@ android {
     buildTypes {
         release {
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig getSigningConfig()
             android.applicationVariants.all { variant ->
                 variant.outputs.all {
@@ -39,6 +39,7 @@ dependencies {
     androidTestImplementation 'com.android.support:support-annotations:28.0.0'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0-beta02'
+    implementation 'com.google.android.play:core:1.10.0'
 
     implementation 'androidx.constraintlayout:constraintlayout:2.0.4'
     implementation 'androidx.multidex:multidex:2.0.1'
@@ -56,9 +57,11 @@ dependencies {
         transitive = true
     }
 
-    implementation 'com.appodeal.ads.sdk:core:2.10.0'
-    implementation 'com.appodeal.ads.sdk.networks:appodeal:2.10.0.2'
-    implementation 'com.appodeal.ads.sdk.networks:bidmachine:2.10.0.10'
+    implementation ('com.appodeal.ads:sdk:2.10.1.+') {
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'amazon_ads'
+        exclude group: 'com.appodeal.ads.sdk.networks', module: 'admob'
+    }
+    implementation 'com.appodeal.ads.sdk:core:2.10.1'
     implementation 'com.google.android.gms:play-services-ads-identifier:17.0.1'
     implementation 'com.criteo.publisher:criteo-publisher-sdk:4.4.0'
     implementation 'com.google.android.exoplayer:exoplayer-hls:2.14.0'
