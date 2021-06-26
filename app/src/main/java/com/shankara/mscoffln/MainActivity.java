@@ -1,6 +1,5 @@
 package com.shankara.mscoffln;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
@@ -8,16 +7,15 @@ import android.content.res.AssetFileDescriptor;
 import android.media.AudioManager;
 import android.media.MediaMetadataRetriever;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -25,7 +23,6 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -45,11 +42,6 @@ import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.android.play.core.tasks.Task;
-import com.mikepenz.materialdrawer.AccountHeader;
-import com.mikepenz.materialdrawer.AccountHeaderBuilder;
-import com.mikepenz.materialdrawer.Drawer;
-import com.mikepenz.materialdrawer.DrawerBuilder;
-import com.mikepenz.materialdrawer.model.ProfileDrawerItem;
 import com.shankara.mscoffln.Adapter.SongAdapter;
 import com.shankara.mscoffln.Model.Song;
 import com.shankara.mscoffln.Utility.LoadJson;
@@ -62,7 +54,6 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Objects;
 import java.util.Random;
 
 import static com.shankara.mscoffln.Config.JSON_ID;
@@ -85,10 +76,11 @@ public class MainActivity extends AppCompatActivity {
     private static int mCount = 0;
     private static int counter = 1;
     boolean intShow = false;
-    Toolbar toolbar;
-    Drawer result;
+    int seekForward = 5000;
+    int seekBackward = 5000;
 
-    final Handler mHandler = new Handler();
+    Looper looper = Looper.getMainLooper();
+    final Handler mHandler = new Handler(looper);
     private ScrollTextView tb_title;
     Animation anim = new AlphaAnimation(0.0f, 1.0f);
     boolean mBlinking = false;
@@ -127,9 +119,8 @@ public class MainActivity extends AppCompatActivity {
             prepareSong(song);
 
         });
-        LinearLayout linearlayout = findViewById(R.id.adView);
         Appodeal.setBannerViewId(R.id.appodealBannerView);
-        Appodeal.show(this, Appodeal.BANNER_VIEW, String.valueOf(linearlayout));
+        Appodeal.show(this, Appodeal.BANNER_VIEW);
         recycler.setAdapter(mAdapter);
         mediaPlayer = new MediaPlayer();
         mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
@@ -157,15 +148,15 @@ public class MainActivity extends AppCompatActivity {
         });
         handleSeekbar();
         pushPlay();
-        btnPrevious();
-        btnNext();
+        btnBackward();
+        btnForward();
         pushShare();
         pushInfo();
-        initDrawer();
+        //initDrawer();
         getSongListMain();
         Review();
     }
-
+    //Version check
     private void versionCheck(){
         appUpdateInfoTask = appUpdateManager.getAppUpdateInfo();
         appUpdateInfoTask.addOnSuccessListener(appUpdateInfo -> {
@@ -219,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
         snackbar.show();
     }
 
+    //Review methode
     private void Review(){
         manager = ReviewManagerFactory.create(this);
         manager.requestReviewFlow().addOnCompleteListener( task -> {
@@ -239,56 +231,7 @@ public class MainActivity extends AppCompatActivity {
         return intent;
     }
 
-    public void initDrawer(){
-        toolbar = findViewById(R.id.toolbar);
-        toolbar.setTitle(getString(R.string.app_name));
-        if (toolbar != null)
-            setSupportActionBar(toolbar);
-        @SuppressLint("UseCompatLoadingForDrawables") AccountHeader headerResult = new AccountHeaderBuilder()
-                .withActivity(this)
-                .withHeaderBackground(R.drawable.header)
-                .withCompactStyle(false)
-                .addProfiles(new ProfileDrawerItem().
-                        withName(getString(R.string.AUTHOR))
-                        .withEmail(getString(R.string.PUBLISHER_EMAIL))
-                        .withIcon(getResources().getDrawable(R.drawable.menu_profile)))
-                .withOnAccountHeaderListener((view, profile, currentProfile) -> false)
-                .build();
-
-        result = new DrawerBuilder()
-                .withActivity(this)
-                .withToolbar(toolbar)
-                .withAccountHeader(headerResult)
-                .inflateMenu(R.menu.main_menu)
-                .withOnDrawerItemClickListener((view, position, drawerItem) -> {
-                    switch (position) {
-                        case 2:
-                            Intent sendIntent = new Intent();
-                            sendIntent.setAction(Intent.ACTION_SEND);
-                            sendIntent.putExtra(Intent.EXTRA_TEXT, "Download " + getString(R.string.app_name) + " in : " + "\n" + "https://play.google.com/store/apps/details?id=" + getPackageName());
-                            sendIntent.setType("text/plain");
-                            startActivity(sendIntent);
-                            break;
-                        case 3:
-                            Uri uri = Uri.parse("https://play.google.com/store/apps/details?id=" + getPackageName());
-                            Intent intent = new Intent(Intent.ACTION_VIEW, uri);
-                            startActivity(intent);
-                            break;
-                        case 4:
-                            Intent intents = new Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.MORE_APP)));
-                            startActivity(intents);
-                            break;
-                        default:
-                            break;
-                    }
-                    return false;
-                })
-                .build();
-        result.setSelection(-1);
-        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(false);
-        result.getActionBarDrawerToggle().setDrawerIndicatorEnabled(true);
-    }
-
+    //music seekbar
     private void handleSeekbar(){
         mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             int seekProgress;
@@ -564,36 +507,17 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void btnPrevious(){
+    private void btnBackward(){
         iv_previous.setOnClickListener(v -> {
-            firstLaunch = false;
-            if(mediaPlayer != null){
-                if(currentIndex - 1 >= 0){
-                    Song previous = songList.get(currentIndex - 1);
-                    changeSelectedSong(currentIndex - 1);
-                    prepareSong(previous);
-                }else{
-                    changeSelectedSong(songList.size() - 1);
-                    prepareSong(songList.get(songList.size() - 1));
-                }
-            }
+            int currentPos = mediaPlayer.getCurrentPosition();
+            mediaPlayer.seekTo(Math.max(currentPos - seekBackward, 0));
         });
     }
 
-    private void btnNext(){
+    private void btnForward(){
         iv_next.setOnClickListener(v -> {
-            firstLaunch = false;
-            if(mediaPlayer != null){
-                if(currentIndex + 1 < songList.size()){
-                    Song next = songList.get(currentIndex + 1);
-                    changeSelectedSong(currentIndex + 1);
-                    prepareSong(next);
-                }else{
-                    changeSelectedSong(0);
-                    prepareSong(songList.get(0));
-                }
-
-            }
+            int currentPos = mediaPlayer.getCurrentPosition();
+            mediaPlayer.seekTo(Math.min(currentPos + seekForward, mediaPlayer.getDuration()));
         });
 
     }
