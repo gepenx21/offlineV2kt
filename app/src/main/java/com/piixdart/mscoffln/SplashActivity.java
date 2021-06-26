@@ -1,4 +1,4 @@
-package com.shankara.mscoffln;
+package com.piixdart.mscoffln;
 
 import android.app.Activity;
 import android.os.Bundle;

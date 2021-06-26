@@ -1,4 +1,4 @@
-package com.shankara.mscoffln;
+package com.piixdart.mscoffln;
 
 import org.junit.Test;
 

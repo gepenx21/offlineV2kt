@@ -123,7 +123,7 @@
                 />
         </RelativeLayout>
 
-        <com.shankara.mscoffln.Utility.ScrollTextView
+        <com.piixdart.mscoffln.Utility.ScrollTextView
             android:id="@+id/tb_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"

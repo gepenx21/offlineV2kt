@@ -1,4 +1,4 @@
-package com.shankara.mscoffln;
+package com.piixdart.mscoffln;
 
 public class Config {
 

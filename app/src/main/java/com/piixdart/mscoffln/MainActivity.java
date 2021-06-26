@@ -1,4 +1,4 @@
-package com.shankara.mscoffln;
+package com.piixdart.mscoffln;
 
 import android.content.Context;
 import android.content.Intent;
@@ -42,11 +42,11 @@ import com.google.android.play.core.review.ReviewInfo;
 import com.google.android.play.core.review.ReviewManager;
 import com.google.android.play.core.review.ReviewManagerFactory;
 import com.google.android.play.core.tasks.Task;
-import com.shankara.mscoffln.Adapter.SongAdapter;
-import com.shankara.mscoffln.Model.Song;
-import com.shankara.mscoffln.Utility.LoadJson;
-import com.shankara.mscoffln.Utility.ScrollTextView;
-import com.shankara.mscoffln.Utility.Utility;
+import com.piixdart.mscoffln.Adapter.SongAdapter;
+import com.piixdart.mscoffln.Model.Song;
+import com.piixdart.mscoffln.Utility.LoadJson;
+import com.piixdart.mscoffln.Utility.ScrollTextView;
+import com.piixdart.mscoffln.Utility.Utility;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -56,7 +56,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
-import static com.shankara.mscoffln.Config.JSON_ID;
+import static com.piixdart.mscoffln.Config.JSON_ID;
 
 
 public class MainActivity extends AppCompatActivity {

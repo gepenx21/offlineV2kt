@@ -15,7 +15,7 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
--keep class com.shankara.mscoffln.Model** {*;}
+-keep class com.piixdart.mscoffln.Model** {*;}
 -keep class com.android.volley.** { *; }
 -keep class org.apache.commons.logging.**
 

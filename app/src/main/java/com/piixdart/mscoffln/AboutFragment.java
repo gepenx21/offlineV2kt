@@ -1,4 +1,4 @@
-package com.shankara.mscoffln;
+package com.piixdart.mscoffln;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
