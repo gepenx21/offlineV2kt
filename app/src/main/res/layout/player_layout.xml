@@ -49,7 +49,7 @@
             >
 
             <ImageView
-                android:id="@+id/iv_previous"
+                android:id="@+id/iv_rewind"
                 android:src="@drawable/selector_previous"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
@@ -77,7 +77,7 @@
                 />
 
             <ImageView
-                android:id="@+id/iv_next"
+                android:id="@+id/iv_forward"
                 android:src="@drawable/selector_next"
                 android:layout_width="40dp"
                 android:layout_height="40dp"

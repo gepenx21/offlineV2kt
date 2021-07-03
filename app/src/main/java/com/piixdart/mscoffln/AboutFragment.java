@@ -54,7 +54,7 @@ public class AboutFragment extends DialogFragment {
             about_content.setVisibility(View.GONE);
             webView.setWebViewClient(new WebViewClient());
             webView.getSettings().setCacheMode(WebSettings.LOAD_DEFAULT);
-            webView.loadUrl("file:///android_asset/shankara.html");
+            webView.loadUrl("file:///android_asset/privacypolicy.html");
             webView.setVisibility(View.VISIBLE);
         });
     }

@@ -26,6 +26,9 @@
         tools:ignore="GoogleAppIndexingWarning"
         tools:replace="android:allowBackup,android:fullBackupContent"
         tools:targetApi="n">
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
         <activity android:name="com.piixdart.mscoffln.SplashActivity"
             android:configChanges="orientation|screenSize">
             <intent-filter>

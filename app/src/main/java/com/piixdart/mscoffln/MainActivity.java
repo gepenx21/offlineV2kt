@@ -68,13 +68,13 @@ public class MainActivity extends AppCompatActivity {
     public static ArrayList<Song> songList;
     private int currentIndex;
     private TextView tv_time, total_duration;
-    private ImageView iv_play, iv_next, iv_previous, iv_share, iv_info;
+    private ImageView iv_play, iv_forward, iv_rewind, iv_share, iv_info;
     private ProgressBar pb_main_loader;
     private MediaPlayer mediaPlayer;
     private SeekBar mSeekBar;
     boolean firstLaunch = true;
-    private static int mCount = 0;
-    private static int counter = 1;
+    private static int playCount = 0;
+    private static int counter = 3;
     boolean intShow = false;
     int seekForward = 5000;
     int seekBackward = 5000;
@@ -111,12 +111,17 @@ public class MainActivity extends AppCompatActivity {
         recycler.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         mAdapter = new SongAdapter(getApplicationContext(), songList, (song, position) -> {
             changeSelectedSong(position);
+            intShow = true;
+            showIntersititial();
             if (mBlinking) {
                 mBlinking = false;
                 tv_time.clearAnimation();
                 tv_time.setAlpha(1.0f);
             }
+            playCount = 0;
+            randomNum();
             prepareSong(song);
+            Log.d("playCount2", Integer.toString(counter));
 
         });
         Appodeal.setBannerViewId(R.id.appodealBannerView);
@@ -136,23 +141,32 @@ public class MainActivity extends AppCompatActivity {
             if (Config.isPlaying){
                 Config.isPlaying=false;
             }
-            if(currentIndex + 1 < songList.size()){
-                Song next = songList.get(currentIndex + 1);
-                changeSelectedSong(currentIndex+1);
-                prepareSong(next);
-            }else{
-                Song next = songList.get(0);
-                changeSelectedSong(0);
-                prepareSong(next);
+
+            playCount++;
+            if (playCount >= counter) {
+                playCount = 0;
+                randomNum();
+                mediaPlayer.stop();
+            } else {
+                if (currentIndex + 1 < songList.size()){
+                    Song next = songList.get(currentIndex + 1);
+                    changeSelectedSong(currentIndex+1);
+                    prepareSong(next);
+                } else {
+                    Song next = songList.get(0);
+                    changeSelectedSong(0);
+                    prepareSong(next);
+                    playCount--;
+                }
             }
+            Log.d("playCount", Integer.toString(playCount));
         });
         handleSeekbar();
         pushPlay();
-        btnBackward();
+        btnRewind();
         btnForward();
         pushShare();
         pushInfo();
-        //initDrawer();
         getSongListMain();
         Review();
     }
@@ -257,7 +271,6 @@ public class MainActivity extends AppCompatActivity {
         if (firstLaunch) {
             firstLaunch = false;
         }
-        showIntersititial(true);
         Config.isPlaying = true;
         pb_main_loader.setVisibility(View.VISIBLE);
         iv_play.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.selector_play));
@@ -303,23 +316,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     static void randomNum() {
-        int number = 5;
-        counter = new Random().nextInt(number);
+        int numberMax = 4;
+        int numberMin = 2;
+        Random random = new Random();
+        counter = random.nextInt(numberMax-numberMin + 1) + numberMin;
     }
 
-    public void showIntersititial(boolean count) {
-        if(count){
-            mCount++;
-            Log.d("mcount",Integer.toString(mCount));
-            Log.d("counter",Integer.toString(counter));
-            if(counter <= mCount) {
-                if (Appodeal.isLoaded(Appodeal.INTERSTITIAL)) {
-                    Appodeal.show(this, Appodeal.INTERSTITIAL);
-                    mCount=0;
-                    intShow = true;
-                }else mCount--;
-            }
-        } else if (Appodeal.isLoaded(Appodeal.INTERSTITIAL)) {
+    public void showIntersititial() {
+        if (Appodeal.isLoaded(Appodeal.INTERSTITIAL)) {
             Appodeal.show(this, Appodeal.INTERSTITIAL);
         }
     }
@@ -365,7 +369,7 @@ public class MainActivity extends AppCompatActivity {
                         mp.start();
                         playProgress();
                         intShow = false;
-                        randomNum();
+
                     }
 
                     @Override
@@ -384,8 +388,8 @@ public class MainActivity extends AppCompatActivity {
 
         tb_title = findViewById(R.id.tb_title);
         iv_play = findViewById(R.id.iv_play);
-        iv_next = findViewById(R.id.iv_next);
-        iv_previous = findViewById(R.id.iv_previous);
+        iv_forward = findViewById(R.id.iv_forward);
+        iv_rewind = findViewById(R.id.iv_rewind);
         total_duration = findViewById(R.id.total_duration);
         pb_main_loader = findViewById(R.id.pb_main_loader);
         recycler = findViewById(R.id.recylerView);
@@ -507,15 +511,15 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    private void btnBackward(){
-        iv_previous.setOnClickListener(v -> {
+    private void btnRewind(){
+        iv_rewind.setOnClickListener(v -> {
             int currentPos = mediaPlayer.getCurrentPosition();
             mediaPlayer.seekTo(Math.max(currentPos - seekBackward, 0));
         });
     }
 
     private void btnForward(){
-        iv_next.setOnClickListener(v -> {
+        iv_forward.setOnClickListener(v -> {
             int currentPos = mediaPlayer.getCurrentPosition();
             mediaPlayer.seekTo(Math.min(currentPos + seekForward, mediaPlayer.getDuration()));
         });

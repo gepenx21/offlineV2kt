@@ -8,6 +8,9 @@
 
     <string name="share">Hi Mate, Try this Mate</string>
     <string name="privacy_title">Privacy Policy</string>
+    <string name="gdpr_title">Do you want us to show you personalized ads?</string>
+    <string name="gdpr_body">This application uses Appodeals to activate / give you a personalized advertising experience. By clicking "Accept" you agree to share your personal data on the Appodeals Network and its Business Partners and agree to the Appodeals privacy policy to allow Appodeals and its partners to provide you with relevant advertisements.</string>
+
 
     <string name="about">This streaming application was developed by Piixdart Dev. \ N All songs that we provide are fully copyrighted by the song owner. \ N \ n Please visit the link below to see the Privacy Policy.</string>
 </resources>
